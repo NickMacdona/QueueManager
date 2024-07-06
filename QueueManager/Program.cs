@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Job;
 
 namespace QueueManager
 {
@@ -23,20 +25,20 @@ namespace QueueManager
     public class JobManager
     {
         private int _jobCount;
-        private List<Job> _jobs;
-        private Dictionary<int, Queue<Job>> _queues;
+        private List<BaseJob> _jobs;
+        private Dictionary<int, Queue<BaseJob>> _queues;
         private readonly ILogger _logger;
 
         public JobManager(int jobCount, ILogger logger)
         {
             _jobCount = jobCount;
-            _jobs = new List<Job>();
-            _queues = new Dictionary<int, Queue<Job>>()
+            _jobs = new List<BaseJob>();
+            _queues = new Dictionary<int, Queue<BaseJob>>()
             {
-                { 1, new Queue<Job>() },
-                { 2, new Queue<Job>() },
-                { 3, new Queue<Job>() },
-                { 4, new Queue<Job>() }
+                { 1, new Queue<BaseJob>() },
+                { 2, new Queue<BaseJob>() },
+                { 3, new Queue<BaseJob>() },
+                { 4, new Queue<BaseJob>() }
             };
             _logger = logger;
         }
@@ -73,7 +75,7 @@ namespace QueueManager
             {
                 while (_queues[queueType].Count > 0)
                 {
-                    Job job = _queues[queueType].Dequeue();
+                    BaseJob job = _queues[queueType].Dequeue();
                     string logMessage = $"Processing {job.Name} from Queue {queueType} with priority {job.Priority} for {job.RunTime}ms";
 
                     writer.WriteLine(logMessage);

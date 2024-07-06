@@ -1,56 +1,60 @@
-﻿namespace QueueManager
+﻿using Job;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace QueueManager
 {
     //consider use of a miniheap in the future to scale better into larger queues
     //todo implement an index dictionary
     //todo implement logging
     public class Queue : IQueue
     {
-        private readonly string _queueName;
-        private readonly int _queueType;
-        private readonly SortedDictionary<int, Job> _queue = new SortedDictionary<int, Job>();
 
-        public Queue(string name, int type)
+        private static int _jobID = 0;
+        private readonly ConcurrentDictionary<int, BaseJob> _queue = new ConcurrentDictionary<int, BaseJob>();
+
+        public Queue()
         {
-            //todo I dont like this implementation and we should have all jobs be in one queue. Lets index on both priority and on type instead
-
-            _queueName = name;
-            _queueType = type;
         }
 
-        public void AddJob(Job job)
+        public bool AddJob(BaseJob job)
         {
-            _queue.Add(GetNewId(), job);
+            int newId = Interlocked.Increment(ref _jobID);
+            return _queue.TryAdd(newId, job);
+            //returns false if we fail to add the job
         }
 
-        public Job? Dequeue()
+        public BaseJob? DequeueFirst()
         {
-            if (_queue.Count > 0)
+            try
             {
-                KeyValuePair<int, Job> firstJob = _queue.First();
-                _queue.Remove(firstJob.Key);
-                return firstJob.Value;
+                int minKey = _queue.Keys.Min(); // Throws InvalidOperationException if dictionary is empty
+                if (_queue.TryRemove(minKey, out BaseJob removedJob))// We handle nulls in this already so we probably don't care if this is a null reference
+                {
+                    Console.WriteLine($"Successfully removed the item with key {minKey}");
+                    return removedJob;
+                }
+                else
+                {
+                    Console.WriteLine($"Failed to remove the item with key {minKey}. The key may not exist.");
+                    return null;
+                }
             }
-            else
+            catch (InvalidOperationException ex)
             {
+                Console.WriteLine($"Error: {ex.Message}");
                 return null;
             }
+            
         }
 
-        private int GetNewId()
+        public BaseJob? DequeuePriority(int priority, String type)
         {
-            if (_queue.Count == 0)
-            {
-                return 1;
-            }
-            else
-            {
-                int newId = _queue.Last().Key + 1;
-                return newId;
-            }
+            return null;
         }
 
-        public string QueueName => _queueName;
-
-        public int Type => _queueType;
     }
 }

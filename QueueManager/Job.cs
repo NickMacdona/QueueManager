@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QueueManager
+namespace Job
 {
-    public class Job
+    public class BaseJob
     {
         public string Name { get; set; }
         public int QueueType { get; set; }
