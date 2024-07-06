@@ -36,7 +36,7 @@ namespace QueueManager
                 {
                     Console.WriteLine($"Successfully removed the item with key {minKey}");
                     return removedJob;
-                }
+                } 
                 else
                 {
                     Console.WriteLine($"Failed to remove the item with key {minKey}. The key may not exist.");
@@ -51,7 +51,7 @@ namespace QueueManager
             
         }
 
-        public BaseJob? DequeuePriority(int priority, String type)
+        public BaseJob? DequeuePriority(int priority)
         {
             return null;
         }

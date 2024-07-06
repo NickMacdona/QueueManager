@@ -12,6 +12,6 @@ namespace QueueManager
         bool AddJob(BaseJob job);
         BaseJob? DequeueFirst();
 
-        BaseJob? DequeuePriority(int priority, String type);
+        BaseJob? DequeuePriority(int priority);
     }
 }
