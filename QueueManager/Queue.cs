@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,6 +24,7 @@ namespace Queue
         public bool AddJob(BaseJob job)
         {
             int newId = Interlocked.Increment(ref _jobID);
+            job.Name = $"{job.Name}_{newId}";
             return _queue.TryAdd(newId, job);
             //returns false if we fail to add the job
         }

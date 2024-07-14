@@ -26,7 +26,7 @@ namespace JobFactory
             {
                 BaseJob job = new BaseJob
                 {
-                    Name = $"Job_{i + 1}",
+                    Name = $"Job",
                     QueueType = random.Next(1, 5),
                     Priority = random.Next(1, 5),
                     RunTime = random.Next(50, 1000)
