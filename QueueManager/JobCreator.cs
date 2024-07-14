@@ -37,11 +37,21 @@ namespace JobFactory
             return jobs;
         }
 
-        public void AddNewJobsToQueue(Queue.BaseQueue queue)
+        public void AddNewJobsToPriorityQueue(Queue.PriorityQueue queue)
         {
             List<BaseJob> _listOfJobs = GenerateJobs();
 
             for (int i = 0; i < _listOfJobs.Count; i++ )
+            {
+                queue.AddJob(_listOfJobs[i]);
+            }
+
+        }
+        public void AddNewJobsToBaseQueue(Queue.BaseQueue queue)
+        {
+            List<BaseJob> _listOfJobs = GenerateJobs();
+
+            for (int i = 0; i < _listOfJobs.Count; i++)
             {
                 queue.AddJob(_listOfJobs[i]);
             }

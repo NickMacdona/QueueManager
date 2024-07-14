@@ -2,21 +2,19 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Queue
-{
-    //consider use of a miniheap in the future to scale better into larger queues
-    //todo implement an index dictionary
-    //todo implement logging
+{ 
     public class PriorityQueue : IQueue
     {
 
         private static int _jobID = 0;
         private readonly ConcurrentDictionary<int, BaseJob> _queue = new ConcurrentDictionary<int, BaseJob>();
-        private readonly ConcurrentDictionary<int, int> _priorityIndex = new ConcurrentDictionary<int, int>();
+        private readonly ConcurrentDictionary<int, int> _priorityIndex = new ConcurrentDictionary<int, int>(); 
 
         public PriorityQueue()
         {
@@ -36,12 +34,26 @@ namespace Queue
             int[,] nextjob = new int[1, 2];
             foreach(var kvp in _priorityIndex)
             {
-                if(kvp.Value > nextjob[0,1] && kvp.Key < nextjob[0,0])
+                if (nextjob[0,0] == 0)
                 {
-                    nextjob[0,1] = kvp.Value;
-                    nextjob[0,0] = kvp.Key;
+                    nextjob[0, 1] = kvp.Value;
+                    nextjob[0, 0] = kvp.Key;
+                }  
+                if (kvp.Value > nextjob[0, 1])
+                {
+                    nextjob[0, 1] = kvp.Value;
+                    nextjob[0, 0] = kvp.Key;
+                }
+                if (kvp.Value == nextjob[0,1])
+                {
+                    if (kvp.Key < nextjob[0, 0])
+                    {
+                        nextjob[0, 1] = kvp.Value;
+                        nextjob[0, 0] = kvp.Key;
+                    }
                 }
             }
+            Console.WriteLine(nextjob);
             return nextjob[0,0];
         }
 
@@ -53,6 +65,7 @@ namespace Queue
                 if (_queue.TryRemove(minKey, out BaseJob removedJob))// We handle nulls in this already so we probably don't care if this is a null reference
                 {
                     Console.WriteLine($"Successfully removed the item with key {minKey}");
+
                     return removedJob;
                 } 
                 else
@@ -71,12 +84,19 @@ namespace Queue
 
         public BaseJob? DequeuePriority(int queuetype)
         {
+            Console.WriteLine("Not implemented for non-typed queue");
+            return null;
+        }
+
+        public BaseJob? DequeuePriority()
+        {
             try
             {
                 int minKey = FindNextJobToRemove(); // returns first key by default
                 if (_queue.TryRemove(minKey, out BaseJob removedJob))// We handle nulls in this already so we probably don't care if this is a null reference
                 {
                     Console.WriteLine($"Successfully removed the item with key {minKey}");
+                    _priorityIndex.TryRemove(minKey, out int value);
                     return removedJob;
                 }
                 else
@@ -90,12 +110,6 @@ namespace Queue
                 Console.WriteLine($"Error: {ex.Message}");
                 return null;
             }
-        }
-
-        public BaseJob? DequeuePriority()
-        {
-            Console.WriteLine("Method is not available for non-priorty indexed queue");
-            return null;
         }
 
     }

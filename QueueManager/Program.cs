@@ -20,10 +20,10 @@ namespace QueueManager
 
             int jobCount = 10;
             JobManager jobManager = new JobManager(jobCount, logger);
-            jobManager.CreateJobs();
-            jobManager.PrintQueue();
-            jobManager.CreateJobs();
-            jobManager.PrintQueue();
+            jobManager.CreatePriorityJobs();
+            jobManager.PrintPriorityQueue();
+            jobManager.CreatePriorityJobs();
+            jobManager.PrintPriorityQueue();
         }
     }
 
@@ -31,16 +31,17 @@ namespace QueueManager
     {
         private int _jobCount;
         private List<BaseJob> _jobs;
-        private readonly Queue.BaseQueue _queue;
+        private readonly Queue.BaseQueue _baseQueue;
+        private readonly Queue.PriorityQueue _priorityQueue;
         private readonly ILogger _logger;
 
-        public void PrintQueue()
+        public void PrintBaseQueue()
         {
             while (true)
             {
                 try
                 {
-                    BaseJob? job = _queue.DequeueFirst();
+                    BaseJob? job = _baseQueue.DequeueFirst();
                     string logMessage = $"Processing {job.Name} from Queue {job.QueueType} with priority {job.Priority} for {job.RunTime} ms";
                     Console.WriteLine(logMessage);
                     Thread.Sleep(job.RunTime);
@@ -60,18 +61,51 @@ namespace QueueManager
             }
         }
 
+        public void PrintPriorityQueue()
+        {
+            while (true)
+            {
+                try
+                {
+                    BaseJob? job = _priorityQueue.DequeuePriority();
+                    string logMessage = $"Processing {job.Name} from Queue {job.QueueType} with priority {job.Priority} for {job.RunTime} ms";
+                    Console.WriteLine(logMessage);
+                    Thread.Sleep(job.RunTime);
+                }
+                catch (NullReferenceException)
+                {
+                    Console.WriteLine("Queue is empty or null job found");
+                    break;
+                }
+                catch (InvalidOperationException)
+                {
+                    Console.WriteLine("Queue is empty or null job found");
+                    break;
+                }
+
+
+            }
+        }
+
         public JobManager(int jobCount, ILogger logger)
         {
             _jobCount = jobCount;
             _jobs = new List<BaseJob>();
-            _queue = new Queue.BaseQueue();
+            _baseQueue = new Queue.BaseQueue();
+            _priorityQueue = new Queue.PriorityQueue();
             _logger = logger;
         }
 
-        public void CreateJobs()
+        public void CreateBaseJobs()
         {
             JobCreator jobCreator = new JobCreator(_jobCount);
-            jobCreator.AddNewJobsToQueue(_queue);
+            jobCreator.AddNewJobsToBaseQueue(_baseQueue);
+        }
+
+        public void CreatePriorityJobs()
+        {
+            JobCreator jobCreator = new JobCreator(_jobCount);
+            jobCreator.AddNewJobsToPriorityQueue(_priorityQueue);
         }
 
         public void StartProcessing() //need to fix this to new queue implementation
@@ -92,9 +126,9 @@ namespace QueueManager
             string logFileName = $"Queue_{queueType}_Log.txt";
             using (StreamWriter writer = new StreamWriter(logFileName))
             {
-                while (_queue.DequeueFirst != null)
+                while (_baseQueue.DequeueFirst != null)
                 {
-                    BaseJob? job = _queue.DequeueFirst();
+                    BaseJob? job = _baseQueue.DequeueFirst();
                     string logMessage = $"Processing {job.Name} from Queue {queueType} with priority {job.Priority} for {job.RunTime}ms";
 
                     writer.WriteLine(logMessage);
