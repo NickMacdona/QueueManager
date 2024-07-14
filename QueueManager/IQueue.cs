@@ -5,13 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Job;
 
-namespace QueueManager
+namespace Queue
 {
     public interface IQueue
     {
         bool AddJob(BaseJob job);
         BaseJob? DequeueFirst();
 
-        BaseJob? DequeuePriority(int priority);
+        BaseJob? DequeuePriority(int queuetype);
+
+        BaseJob? DequeuePriority();
     }
 }

@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Job;
+using Queue;
+using JobFactory;
 
 namespace QueueManager
 {
@@ -26,36 +28,24 @@ namespace QueueManager
     {
         private int _jobCount;
         private List<BaseJob> _jobs;
-        private Dictionary<int, Queue<BaseJob>> _queues;
+        private readonly Queue.Queue _queue;
         private readonly ILogger _logger;
 
         public JobManager(int jobCount, ILogger logger)
         {
             _jobCount = jobCount;
             _jobs = new List<BaseJob>();
-            _queues = new Dictionary<int, Queue<BaseJob>>()
-            {
-                { 1, new Queue<BaseJob>() },
-                { 2, new Queue<BaseJob>() },
-                { 3, new Queue<BaseJob>() },
-                { 4, new Queue<BaseJob>() }
-            };
+            _queue = new Queue.Queue();
             _logger = logger;
         }
 
         public void CreateJobs()
         {
             JobCreator jobCreator = new JobCreator(_jobCount);
-            _jobs = jobCreator.GenerateJobs();
-
-            foreach (var job in _jobs)
-            {
-                _queues[job.QueueType].Enqueue(job);
-                _logger.LogInformation($"Created {job.Name} in Queue {job.QueueType} with priority {job.Priority} and runtime {job.RunTime}ms");
-            }
+            jobCreator.AddNewJobsToQueue(_queue);
         }
 
-        public void StartProcessing()
+        public void StartProcessing() //need to fix this to new queue implementation
         {
             List<Task> tasks = new List<Task>();
 
@@ -73,9 +63,9 @@ namespace QueueManager
             string logFileName = $"Queue_{queueType}_Log.txt";
             using (StreamWriter writer = new StreamWriter(logFileName))
             {
-                while (_queues[queueType].Count > 0)
+                while (_queue.DequeueFirst != null)
                 {
-                    BaseJob job = _queues[queueType].Dequeue();
+                    BaseJob? job = _queue.DequeueFirst();
                     string logMessage = $"Processing {job.Name} from Queue {queueType} with priority {job.Priority} for {job.RunTime}ms";
 
                     writer.WriteLine(logMessage);
@@ -85,6 +75,8 @@ namespace QueueManager
 
                     Thread.Sleep(job.RunTime);
                 }
+
+                Console.Write("Queue is empty or null job found");
             }
         }
     }

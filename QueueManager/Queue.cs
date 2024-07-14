@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace QueueManager
+namespace Queue
 {
     //consider use of a miniheap in the future to scale better into larger queues
     //todo implement an index dictionary
@@ -51,7 +51,12 @@ namespace QueueManager
             
         }
 
-        public BaseJob? DequeuePriority(int priority)
+        public BaseJob? DequeuePriority(int queuetype)
+        {
+            return null;
+        }
+
+        public BaseJob? DequeuePriority()
         {
             return null;
         }

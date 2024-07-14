@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Job;
+using Queue;
 
-namespace QueueManager
+namespace JobFactory
+
 {
     public class JobCreator
     {
@@ -15,13 +18,13 @@ namespace QueueManager
             _jobCount = jobCount;
         }
 
-        public List<Job> GenerateJobs()
+        private List<BaseJob> GenerateJobs()
         {
-            List<Job> jobs = new List<Job>();
+            List<BaseJob> jobs = new List<BaseJob>();
             Random random = new Random();
             for (int i = 0; i < _jobCount; i++)
             {
-                Job job = new Job
+                BaseJob job = new BaseJob
                 {
                     Name = $"Job_{i + 1}",
                     QueueType = random.Next(1, 5),
@@ -30,7 +33,19 @@ namespace QueueManager
                 };
                 jobs.Add(job);
             }
+            _jobCount = 0;
             return jobs;
+        }
+
+        public void AddNewJobsToQueue(Queue.Queue queue)
+        {
+            List<BaseJob> _listOfJobs = GenerateJobs();
+
+            for (int i = 0; i < _listOfJobs.Count; i++ )
+            {
+                queue.AddJob(_listOfJobs[i]);
+            }
+
         }
     }
 }
