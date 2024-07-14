@@ -37,7 +37,7 @@ namespace JobFactory
             return jobs;
         }
 
-        public void AddNewJobsToQueue(Queue.Queue queue)
+        public void AddNewJobsToQueue(Queue.BaseQueue queue)
         {
             List<BaseJob> _listOfJobs = GenerateJobs();
 

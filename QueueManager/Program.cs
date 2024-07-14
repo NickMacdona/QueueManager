@@ -31,7 +31,7 @@ namespace QueueManager
     {
         private int _jobCount;
         private List<BaseJob> _jobs;
-        private readonly Queue.Queue _queue;
+        private readonly Queue.BaseQueue _queue;
         private readonly ILogger _logger;
 
         public void PrintQueue()
@@ -64,7 +64,7 @@ namespace QueueManager
         {
             _jobCount = jobCount;
             _jobs = new List<BaseJob>();
-            _queue = new Queue.Queue();
+            _queue = new Queue.BaseQueue();
             _logger = logger;
         }
 
