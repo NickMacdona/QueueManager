@@ -29,7 +29,7 @@ namespace JobFactory
                     Name = $"Job_{i + 1}",
                     QueueType = random.Next(1, 5),
                     Priority = random.Next(1, 5),
-                    RunTime = random.Next(50, 5001)
+                    RunTime = random.Next(50, 1000)
                 };
                 jobs.Add(job);
             }

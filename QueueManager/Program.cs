@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Job;
 using Queue;
 using JobFactory;
+using System.Linq.Expressions;
 
 namespace QueueManager
 {
@@ -20,7 +21,9 @@ namespace QueueManager
             int jobCount = 10;
             JobManager jobManager = new JobManager(jobCount, logger);
             jobManager.CreateJobs();
-            jobManager.StartProcessing();
+            jobManager.PrintQueue();
+            jobManager.CreateJobs();
+            jobManager.PrintQueue();
         }
     }
 
@@ -30,6 +33,32 @@ namespace QueueManager
         private List<BaseJob> _jobs;
         private readonly Queue.Queue _queue;
         private readonly ILogger _logger;
+
+        public void PrintQueue()
+        {
+            while (true)
+            {
+                try
+                {
+                    BaseJob? job = _queue.DequeueFirst();
+                    string logMessage = $"Processing {job.Name} from Queue {job.QueueType} with priority {job.Priority} for {job.RunTime} ms";
+                    Console.WriteLine(logMessage);
+                    Thread.Sleep(job.RunTime);
+                }
+                catch (NullReferenceException)
+                {
+                    Console.WriteLine("Queue is empty or null job found");
+                    break; 
+                }
+                catch (InvalidOperationException)
+                {
+                    Console.WriteLine("Queue is empty or null job found");
+                    break;
+                }
+                
+
+            }
+        }
 
         public JobManager(int jobCount, ILogger logger)
         {
