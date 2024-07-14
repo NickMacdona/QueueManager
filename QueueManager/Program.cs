@@ -99,13 +99,13 @@ namespace QueueManager
         public void CreateBaseJobs()
         {
             JobCreator jobCreator = new JobCreator(_jobCount);
-            jobCreator.AddNewJobsToBaseQueue(_baseQueue);
+            jobCreator.AddNewJobsToQueue(_baseQueue);
         }
 
         public void CreatePriorityJobs()
         {
             JobCreator jobCreator = new JobCreator(_jobCount);
-            jobCreator.AddNewJobsToPriorityQueue(_priorityQueue);
+            jobCreator.AddNewJobsToQueue(_priorityQueue);
         }
 
         public void StartProcessing() //need to fix this to new queue implementation

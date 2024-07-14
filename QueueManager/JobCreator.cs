@@ -9,7 +9,7 @@ using Queue;
 namespace JobFactory
 
 {
-    public class JobCreator
+    public class JobCreator : IJobCreator
     {
         private int _jobCount;
 
@@ -33,21 +33,12 @@ namespace JobFactory
                 };
                 jobs.Add(job);
             }
+            Console.Write($"Adding {_jobCount} jobs to the queue");
             _jobCount = 0;
             return jobs;
         }
 
-        public void AddNewJobsToPriorityQueue(Queue.PriorityQueue queue)
-        {
-            List<BaseJob> _listOfJobs = GenerateJobs();
-
-            for (int i = 0; i < _listOfJobs.Count; i++ )
-            {
-                queue.AddJob(_listOfJobs[i]);
-            }
-
-        }
-        public void AddNewJobsToBaseQueue(Queue.BaseQueue queue)
+        public void AddNewJobsToQueue(Queue.IQueue queue)
         {
             List<BaseJob> _listOfJobs = GenerateJobs();
 
@@ -55,6 +46,20 @@ namespace JobFactory
             {
                 queue.AddJob(_listOfJobs[i]);
             }
+
+        }
+
+        public void AddSingleJob(IQueue queue, String name, int queuetype, int priority, int runtime)
+        {
+            BaseJob job = new BaseJob
+            {
+                Name = name,
+                QueueType = queuetype,
+                Priority = priority,
+                RunTime = runtime
+            };
+            queue.AddJob(job);
+            Console.Write($"Adding single job {name} to the queue");
 
         }
     }
